@@ -1,19 +1,17 @@
+
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 .kotlin
 
-### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
+### IntelliJ IDEA
+.idea/
 *.iws
 *.iml
 *.ipr
 
-### Eclipse ###
+### Eclipse
 .apt_generated
 .classpath
 .factorypath
@@ -22,43 +20,36 @@ target/
 .springBeans
 .sts4-cache
 
-### NetBeans ###
+### NetBeans
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
+
+### Build files
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
+### VS Code
 .vscode/
 
-### Mac OS ###
+### Mac OS
 .DS_Store
 
-
-### DNSpectra datasets ###
-data/raw/
-data/processed/
-
-# Keep empty dataset folders in Git
+### DNSpectra datasets and generated data
+data/
+!data/raw/
 !data/raw/.gitkeep
+!data/processed/
 !data/processed/.gitkeep
 
-### Machine Learning ###
-# Ignore generated model files for now
-models/
-
-### Reports and temporary files ###
+### Reports and temporary files
 *.log
 *.tmp
 
-### Environment and sensitive information ###
+### Environment and sensitive information
 .env
 .env.*
 !.env.example
-
-### IntelliJ IDEA ###
-.idea/

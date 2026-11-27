@@ -1,0 +1,617 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DNSpectra | AI Threat Intelligence</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --background: #070b16;
+            --panel: rgba(17, 25, 45, 0.78);
+            --panel-border: rgba(112, 145, 190, 0.16);
+            --cyan: #22d3ee;
+            --blue: #38bdf8;
+            --violet: #a78bfa;
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background:
+                    radial-gradient(ellipse at 15% 10%, rgba(14, 116, 144, 0.17), transparent 38%),
+                    radial-gradient(ellipse at 85% 30%, rgba(109, 40, 217, 0.13), transparent 35%),
+                    var(--background);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.13;
+            background-image:
+                    linear-gradient(rgba(56, 189, 248, 0.08) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(56, 189, 248, 0.08) 1px, transparent 1px);
+            background-size: 48px 48px;
+            mask-image: linear-gradient(to bottom, black, transparent 85%);
+        }
+
+        .topbar {
+            height: 78px;
+            padding: 0 7%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+            background: rgba(7, 11, 22, 0.78);
+            backdrop-filter: blur(18px);
+            position: relative;
+            z-index: 2;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 13px;
+            display: grid;
+            place-items: center;
+            font-size: 23px;
+            color: var(--cyan);
+            background: rgba(34, 211, 238, 0.09);
+            border: 1px solid rgba(34, 211, 238, 0.35);
+            box-shadow: 0 0 22px rgba(34, 211, 238, 0.12);
+        }
+
+        .brand-name {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .brand-name span {
+            color: var(--cyan);
+        }
+
+        .brand-caption {
+            color: var(--muted);
+            font-size: 10px;
+            letter-spacing: 2px;
+            margin-top: 3px;
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #a7f3d0;
+            font-size: 12px;
+            padding: 9px 15px;
+            border: 1px solid rgba(52, 211, 153, 0.2);
+            border-radius: 30px;
+            background: rgba(16, 185, 129, 0.07);
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #34d399;
+            box-shadow: 0 0 10px #34d399;
+        }
+
+        main {
+            width: min(1100px, 88%);
+            margin: 65px auto 55px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero {
+            margin-bottom: 38px;
+        }
+
+        .eyebrow {
+            color: var(--cyan);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            margin-bottom: 17px;
+        }
+
+        .hero h1 {
+            font-size: clamp(34px, 5vw, 55px);
+            line-height: 1.13;
+            letter-spacing: -2.5px;
+            max-width: 750px;
+            margin-bottom: 17px;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(90deg, var(--cyan), var(--violet));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero p {
+            max-width: 650px;
+            color: var(--muted);
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        .workflow {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 22px;
+        }
+
+        .workflow span {
+            font-size: 11px;
+            color: #cbd5e1;
+            padding: 8px 12px;
+            border-radius: 7px;
+            border: 1px solid var(--panel-border);
+            background: rgba(15, 23, 42, 0.65);
+        }
+
+        .workflow span b {
+            color: var(--cyan);
+            margin-right: 5px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 290px;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .glass-card {
+            background: var(--panel);
+            border: 1px solid var(--panel-border);
+            border-radius: 17px;
+            padding: 29px;
+            backdrop-filter: blur(18px);
+            box-shadow: 0 18px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 27px;
+        }
+
+        .section-icon {
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            border-radius: 11px;
+            color: var(--cyan);
+            background: rgba(34, 211, 238, 0.09);
+            border: 1px solid rgba(34, 211, 238, 0.2);
+            font-size: 19px;
+        }
+
+        .section-heading h2 {
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .section-heading p {
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 23px;
+        }
+
+        label {
+            display: block;
+            color: #cbd5e1;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        select, input {
+            width: 100%;
+            min-height: 48px;
+            padding: 0 14px;
+            color: var(--text);
+            background: rgba(5, 10, 23, 0.75);
+            border: 1px solid #293750;
+            border-radius: 9px;
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+            transition: 0.2s ease;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.08);
+        }
+
+        select option {
+            background: #111c30;
+        }
+
+        .upload-area {
+            border: 1px dashed rgba(56, 189, 248, 0.4);
+            background: rgba(14, 165, 233, 0.035);
+            border-radius: 13px;
+            padding: 26px 20px;
+            text-align: center;
+            transition: 0.25s ease;
+        }
+
+        .upload-area:hover {
+            border-color: var(--cyan);
+            background: rgba(34, 211, 238, 0.055);
+        }
+
+        .upload-icon {
+            font-size: 33px;
+            color: var(--cyan);
+            margin-bottom: 12px;
+        }
+
+        .upload-area input {
+            min-height: auto;
+            border: none;
+            background: transparent;
+            box-shadow: none;
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        .upload-area p {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .upload-area strong {
+            color: #e2e8f0;
+        }
+
+        .analyse-button {
+            width: 100%;
+            min-height: 51px;
+            margin-top: 5px;
+            border: none;
+            border-radius: 9px;
+            color: #04111b;
+            background: linear-gradient(100deg, #22d3ee, #38bdf8 55%, #818cf8);
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+            cursor: pointer;
+            box-shadow: 0 5px 25px rgba(34, 211, 238, 0.15);
+            transition: 0.25s ease;
+        }
+
+        .analyse-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(34, 211, 238, 0.3);
+        }
+
+        .analyse-button:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 17px;
+        }
+
+        .info-card {
+            background: rgba(17, 25, 45, 0.65);
+            border: 1px solid var(--panel-border);
+            border-radius: 14px;
+            padding: 21px;
+        }
+
+        .info-card h3 {
+            font-size: 13px;
+            margin-bottom: 13px;
+        }
+
+        .info-card p {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .model-item {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 11px 0;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            font-size: 12px;
+            color: #cbd5e1;
+        }
+
+        .model-item:last-child {
+            border-bottom: none;
+        }
+
+        .model-symbol {
+            width: 29px;
+            height: 29px;
+            display: grid;
+            place-items: center;
+            border-radius: 8px;
+            background: rgba(167, 139, 250, 0.1);
+            color: var(--violet);
+        }
+
+        .notice {
+            color: #fbbf24 !important;
+            font-size: 11px !important;
+        }
+
+        .status-message {
+            color: #67e8f9;
+            font-size: 12px;
+            margin-top: 16px;
+            min-height: 18px;
+        }
+
+        footer {
+            text-align: center;
+            border-top: 1px solid rgba(148, 163, 184, 0.1);
+            padding: 25px;
+            color: #64748b;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 800px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .side-panel {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+            }
+
+            main {
+                margin-top: 42px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .topbar {
+                padding: 0 5%;
+            }
+
+            .system-status {
+                font-size: 10px;
+                padding: 8px 10px;
+            }
+
+            .brand-name {
+                font-size: 19px;
+            }
+
+            main {
+                width: 90%;
+            }
+
+            .glass-card {
+                padding: 21px;
+            }
+
+            .side-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="topbar">
+
+    <div class="brand">
+        <div class="brand-icon">⌘</div>
+
+        <div>
+            <div class="brand-name">DNS<span>pectra</span></div>
+            <div class="brand-caption">INTELLIGENT THREAT ANALYSIS</div>
+        </div>
+    </div>
+
+    <div class="system-status">
+        <span class="status-dot"></span>
+        APPLICATION ONLINE
+    </div>
+
+</header>
+
+<main>
+
+    <section class="hero">
+
+        <div class="eyebrow">NEXT-GENERATION DNS SECURITY</div>
+
+        <h1>
+            See Beyond the
+            <span>DNS Traffic.</span>
+        </h1>
+
+        <p>
+            An intelligent analysis environment powered by machine learning.
+            Examine DNS traffic patterns, identify suspicious behaviour,
+            and explore potential DNS tunnelling indicators.
+        </p>
+
+        <div class="workflow">
+            <span><b>01</b> Upload Dataset</span>
+            <span><b>02</b> Select AI Model</span>
+            <span><b>03</b> Analyse Traffic</span>
+        </div>
+
+    </section>
+
+    <section class="dashboard-grid">
+
+        <div class="glass-card">
+
+            <div class="section-heading">
+                <div class="section-icon">⌁</div>
+
+                <div>
+                    <h2>Analysis Configuration</h2>
+                    <p>Configure your DNS machine-learning experiment</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="featureGroup">FEATURE REPRESENTATION</label>
+
+                <select id="featureGroup">
+                    <option value="stateful">Stateful Features</option>
+                    <option value="stateless">Stateless Features</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="modelName">MACHINE LEARNING MODEL</label>
+
+                <select id="modelName">
+                    <option value="decision-tree">Decision Tree</option>
+                    <option value="random-forest">Random Forest</option>
+                    <option value="logistic-regression">Logistic Regression</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+
+                <label for="csvFile">DNS DATASET INPUT</label>
+
+                <div class="upload-area">
+
+                    <div class="upload-icon">⇧</div>
+
+                    <p>
+                        <strong>Import DNS feature dataset</strong><br>
+                        Select a CSV file from your computer
+                    </p>
+
+                    <input type="file" id="csvFile" accept=".csv">
+
+                    <p>Supported format: CSV</p>
+
+                </div>
+
+            </div>
+
+            <button class="analyse-button" id="analyseButton" type="button">
+                ◈ &nbsp; ANALYSE DNS TRAFFIC
+            </button>
+
+            <p class="status-message" id="status">
+                Dashboard interface initialised.
+            </p>
+
+        </div>
+
+        <aside class="side-panel">
+
+            <div class="info-card">
+
+                <h3>◈ &nbsp; AVAILABLE MODELS</h3>
+
+                <div class="model-item">
+                    <span class="model-symbol">◇</span>
+                    Decision Tree
+                </div>
+
+                <div class="model-item">
+                    <span class="model-symbol">▦</span>
+                    Random Forest
+                </div>
+
+                <div class="model-item">
+                    <span class="model-symbol">∑</span>
+                    Logistic Regression
+                </div>
+
+            </div>
+
+            <div class="info-card">
+
+                <h3>◎ &nbsp; ANALYSIS SCOPE</h3>
+
+                <p>
+                    DNS traffic classification using stateful and
+                    stateless feature representations.
+                </p>
+
+            </div>
+
+            <div class="info-card">
+
+                <h3>⚠ &nbsp; SECURITY NOTICE</h3>
+
+                <p class="notice">
+                    A suspicious prediction is an indication for
+                    further investigation, not proof of a cyberattack.
+                    Machine-learning results may contain false positives
+                    and false negatives.
+                </p>
+
+            </div>
+
+        </aside>
+
+    </section>
+
+</main>
+
+<footer>
+    DNSPECTRA &nbsp; | &nbsp; AI-POWERED DNS TUNNELLING DETECTION
+    <br><br>
+    Academic Research &nbsp; • &nbsp; Machine Learning &nbsp; • &nbsp; Cybersecurity
+</footer>
+<script src="app.js"></script>
+<script src="feature-importance.js"></script>
+</body>
+</html>
